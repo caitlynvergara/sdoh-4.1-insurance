@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insurance Programs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #002045;
+    --navy-deep: #102A43;
+    --navy-container: #1a365d;
+    --gold: #FFB800;
+    --gold-soft: #ffddba;
+    --amber: #a66a15;
+    --clean-blue: #EBF8FF;
+    --surface-white: #ffffff;
+    --surface-low: #f1f4f6;
+    --border: #E2E8F0;
+    --text: #181c1e;
+    --text-muted: #43474e;
+    --shadow-soft: 0 4px 20px rgba(26, 54, 93, 0.08);
+    --shadow-lift: 0 10px 32px rgba(26, 54, 93, 0.14);
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-pill: 9999px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Merriweather', Georgia, serif;
+    background: #ffffff;
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 22px 24px 10px;
+  }
+
+  /* Animated amber subheader */
+  .subheader {
+    font-family: 'Lato', sans-serif;
+    font-size: clamp(19px, 2.4vw, 24px);
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1.4;
+    margin: 0 0 18px;
+    letter-spacing: -0.005em;
+    max-width: 980px;
+    min-height: 1.4em;
+  }
+
+  .subheader.fade-anim {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .caret {
+    display: inline-block;
+    width: 0.08em;
+    height: 1em;
+    margin-left: 0.04em;
+    vertical-align: -0.15em;
+    background: currentColor;
+    animation: caretBlink 1s steps(2) infinite;
+  }
+  .caret.hidden { display: none; }
+  @keyframes caretBlink { 50% { opacity: 0; } }
+
+  /* Progress card */
+  .progress-card {
+    background: var(--surface-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin: 0 0 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 10px;
+    background: var(--surface-low);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #FFD24D 0%, var(--gold) 50%, #E69A00 100%);
+    border-radius: var(--radius-pill);
+    transition: width .55s cubic-bezier(.2,.7,.2,1);
+  }
+  .progress-label {
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--navy);
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+
+  /* Grid: 2x2 cards */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 0;
+  }
+
+  .card-wrapper {
+    perspective: 1200px;
+    height: 320px;
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-style: preserve-3d;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-family: inherit;
+    text-align: left;
+    color: inherit;
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-face-front {
+    background: var(--surface-white);
+    border: 1px solid var(--border);
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .card-face-front::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--navy);
+    transition: background 0.25s ease, height 0.25s ease;
+  }
+
+  .card:hover .card-face-front,
+  .card:focus-visible .card-face-front {
+    box-shadow: var(--shadow-lift);
+    border-color: var(--navy-container);
+  }
+
+  .card:focus-visible { outline: none; }
+
+  .card:focus-visible .card-face-front::before {
+    background: var(--gold);
+    height: 6px;
+  }
+
+  .card.completed .card-face-front::before { background: var(--gold); }
+
+  .card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    background: var(--clean-blue);
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  .card:hover .card-icon { transform: translateY(-2px); }
+  .card.completed .card-icon { background: var(--gold-soft); }
+  .card-icon svg { width: 34px; height: 34px; }
+
+  .card-term {
+    font-family: 'Lato', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--navy);
+    margin: 0;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+  }
+
+  .card-cta {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0.02em;
+  }
+  .card-cta svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+  }
+  .card:hover .card-cta svg { transform: translateX(3px); }
+  .card.completed .card-cta { color: #2F855A; }
+
+  .card-face-back {
+    background: var(--navy);
+    color: #fff;
+    transform: rotateY(180deg);
+    overflow-y: auto;
+    padding: 22px;
+  }
+  .card-face-back::-webkit-scrollbar { width: 6px; }
+  .card-face-back::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .back-term {
+    font-family: 'Lato', sans-serif;
+    font-size: 17px;
+    font-weight: 900;
+    margin: 0 0 14px;
+    color: var(--gold);
+    padding-right: 36px;
+    line-height: 1.25;
+  }
+
+  .back-section { margin-bottom: 14px; }
+  .back-section:last-child { margin-bottom: 0; }
+
+  .back-label {
+    font-family: 'Lato', sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+    display: block;
+  }
+  .back-text {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+  }
+
+  .back-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+  }
+  .back-close:hover,
+  .back-close:focus-visible {
+    background: rgba(255, 255, 255, 0.25);
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .back-close svg { width: 14px; height: 14px; }
+
+  /* Tweaks panel */
+  .tw-panel {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    width: 286px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 16px 40px rgba(26, 54, 93, 0.18);
+    font-family: 'Lato', sans-serif;
+    color: var(--text);
+    z-index: 9999;
+    display: none;
+    overflow: hidden;
+  }
+  .tw-panel.open { display: block; }
+  .tw-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--navy);
+    color: #fff;
+  }
+  .tw-head h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .tw-close {
+    background: rgba(255,255,255,0.14);
+    border: none;
+    color: #fff;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+  }
+  .tw-close:hover, .tw-close:focus-visible {
+    background: rgba(255,255,255,0.28);
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  .tw-close svg { width: 14px; height: 14px; }
+  .tw-body { padding: 14px; }
+  .tw-section { margin-bottom: 14px; }
+  .tw-section:last-child { margin-bottom: 0; }
+  .tw-label {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .tw-label .tw-value {
+    font-family: 'Lato', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0;
+    text-transform: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .tw-seg {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: var(--surface-low);
+    border-radius: 8px;
+    padding: 2px;
+    gap: 2px;
+  }
+  .tw-seg button {
+    background: transparent;
+    border: none;
+    padding: 7px 6px;
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .tw-seg button[aria-pressed="true"] {
+    background: #fff;
+    color: var(--navy);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .tw-seg button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  .tw-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--surface-low);
+    border-radius: 999px;
+    outline: none;
+  }
+  .tw-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--navy);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .tw-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--navy);
+    cursor: pointer;
+    border: 2px solid #fff;
+  }
+  .tw-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .tw-toggle span {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .tw-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: var(--surface-low);
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s ease;
+  }
+  .tw-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    transition: left 0.2s ease;
+  }
+  .tw-switch[aria-checked="true"] { background: var(--navy); }
+  .tw-switch[aria-checked="true"]::after { left: 18px; }
+  .tw-switch:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .tw-swatches { display: flex; gap: 8px; }
+  .tw-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .tw-swatch:hover { transform: scale(1.08); }
+  .tw-swatch[aria-pressed="true"] {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 2px #fff inset;
+  }
+  .tw-swatch:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .tw-row-hide { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .subheader { opacity: 1; transform: none; animation: none; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+    .card.flipped { transform: rotateY(180deg); }
+  }
+
+  @media (max-width: 880px) {
+    .grid { grid-template-columns: 1fr; gap: 16px; }
+    .card-wrapper { height: 320px; }
+    .container { padding: 20px 18px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2 class="subheader" id="subheader" aria-label="Understand the insurance programs your clients may be navigating."><span id="typed"></span><span class="caret" id="caret" aria-hidden="true"></span></h2>
+
+  <div class="progress-card" role="group" aria-label="Exploration progress">
+    <div class="progress-track" aria-hidden="true">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 of 4 explored.</div>
+  </div>
+
+  <div class="grid" id="cardGrid"></div>
+</div>
+
+<aside class="tw-panel" id="twPanel" role="dialog" aria-label="Tweaks" aria-hidden="true">
+  <div class="tw-head">
+    <h4>Tweaks</h4>
+    <button class="tw-close" id="twClose" aria-label="Close tweaks panel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="tw-body">
+    <div class="tw-section">
+      <div class="tw-label"><span>Subheader animation</span></div>
+      <div class="tw-seg" role="group" aria-label="Animation style" id="twAnim">
+        <button type="button" data-val="typewriter" aria-pressed="true">Type</button>
+        <button type="button" data-val="fade" aria-pressed="false">Fade</button>
+        <button type="button" data-val="instant" aria-pressed="false">Instant</button>
+      </div>
+    </div>
+    <div class="tw-section" id="twSpeedRow">
+      <div class="tw-label"><span>Typing speed</span><span class="tw-value" id="twSpeedVal">33 ms</span></div>
+      <input type="range" class="tw-slider" id="twSpeed" min="15" max="90" step="1" value="33" aria-label="Milliseconds per character">
+    </div>
+    <div class="tw-section" id="twCursorRow">
+      <div class="tw-toggle">
+        <span>Blinking cursor</span>
+        <button type="button" class="tw-switch" id="twCursor" role="switch" aria-checked="true" aria-label="Blinking cursor"></button>
+      </div>
+    </div>
+    <div class="tw-section">
+      <div class="tw-label"><span>Subheader color</span></div>
+      <div class="tw-swatches" role="group" aria-label="Subheader color" id="twColor">
+        <button type="button" class="tw-swatch" data-val="#a66a15" style="background:#a66a15" aria-pressed="true" aria-label="Amber"></button>
+        <button type="button" class="tw-swatch" data-val="#002045" style="background:#002045" aria-pressed="false" aria-label="Navy"></button>
+        <button type="button" class="tw-swatch" data-val="#102A43" style="background:#102A43" aria-pressed="false" aria-label="Deep navy"></button>
+        <button type="button" class="tw-swatch" data-val="#43474e" style="background:#43474e" aria-pressed="false" aria-label="Charcoal"></button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<script>
+  /* ---------- Tweak defaults (persisted via host) ---------- */
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "animationStyle": "typewriter",
+    "typingSpeedMs": 37,
+    "showCursor": true,
+    "subheaderColor": "#a66a15"
+  }/*EDITMODE-END*/;
+
+  const tweaks = Object.assign({}, TWEAK_DEFAULTS);
+
+  const programs = [
+    {
+      id: 'medicaid',
+      term: 'Medicaid',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 4 5.5v6.2c0 4.5 3.4 8.3 8 9.3 4.6-1 8-4.8 8-9.3V5.5l-8-3Z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>',
+      definition: 'Medicaid is a government health insurance program for low-income adults, children, pregnant people, elderly individuals, and people with disabilities. It is funded jointly by the federal government and individual states, with each state administering its own version of the program.',
+      access: 'Who qualifies for Medicaid and what it covers depends on the state where a person lives. Each state sets its own income thresholds and eligibility rules, which means two people with identical circumstances can have different access to care based solely on their ZIP code. '
+    },
+    {
+      id: 'medicare',
+      term: 'Medicare',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12.5a4.5 4.5 0 0 0-7.7-3.2L12 10l-.8-.7a4.5 4.5 0 0 0-6.4 6.4l6.4 6.3a1.1 1.1 0 0 0 1.6 0l6.4-6.3a4.5 4.5 0 0 0 1.3-3.2Z"/><polyline points="6 13 9 13 10.5 10 13.5 16 15 13 18 13"/></svg>',
+      definition: 'Medicare is a federal health insurance program for people 65 and older, people with certain disabilities, and people with end-stage kidney disease. It covers hospital care, prescription drugs, and outpatient treatment.',
+      access: 'Medicare does not cover long-term care such as nursing homes or assisted living. For elderly or disabled people who need sustained daily support, this gap often creates barriers to care. '
+    },
+    {
+      id: 'aca',
+      term: 'ACA Marketplace Plans',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5 5 4h14l1.5 4.5"/><path d="M3.5 8.5h17V10a3 3 0 0 1-6 0 3 3 0 0 1-5 0 3 3 0 0 1-6 0V8.5Z"/><path d="M5 12.5V20h14v-7.5"/><path d="M10.5 20v-5h3v5"/></svg>',
+      definition: 'ACA Marketplace plans are subsidized insurance options for people who do not qualify for Medicaid or Medicare but cannot afford private insurance. People can shop for plans through government-run health insurance marketplaces.',
+      access: 'The ACA expanded coverage for millions of people, but only in states that chose to expand Medicaid. Where someone lives and the policy decisions made in that state directly determine whether a pathway to coverage exists for them.'
+    },
+    {
+      id: 'private',
+      term: 'Private Insurance',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7.5" width="18" height="12.5" rx="2"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5"/><line x1="3" y1="13" x2="21" y2="13"/><rect x="10.8" y="12" width="2.4" height="2.4" rx="0.4"/></svg>',
+      definition: 'Private insurance is health coverage obtained through an employer or purchased independently by an individual. Cost and coverage vary widely depending on the plan.',
+      access: 'Because private insurance is often tied to employment, people in part-time, unstable, or gig-economy jobs are far less likely to have it. Access to healthcare becomes linked to the type of work a person does, which reinforces existing inequalities.'
+    }
+  ];
+
+  const grid = document.getElementById('cardGrid');
+  const fillEl = document.getElementById('progressFill');
+  const labelEl = document.getElementById('progressLabel');
+  const viewed = new Set();
+
+  function renderCards() {
+    programs.forEach((c, i) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'card-wrapper';
+
+      const card = document.createElement('button');
+      card.className = 'card';
+      card.type = 'button';
+      card.setAttribute('aria-label', `${c.term}. Click to view definition.`);
+      card.setAttribute('aria-pressed', 'false');
+      card.dataset.index = i;
+
+      card.innerHTML = `
+        <div class="card-face card-face-front">
+          <div class="card-icon" aria-hidden="true">${c.icon}</div>
+          <h3 class="card-term">${c.term}</h3>
+          <div class="card-cta">
+            <span class="cta-text">Click to flip</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </div>
+        </div>
+        <div class="card-face card-face-back" aria-hidden="true">
+          <button class="back-close" aria-label="Flip card back" tabindex="-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <h3 class="back-term">${c.term}</h3>
+          <div class="back-section">
+            <span class="back-label">Definition</span>
+            <p class="back-text">${c.definition}</p>
+          </div>
+          <div class="back-section">
+            <span class="back-label">How systems shape access</span>
+            <p class="back-text">${c.access}</p>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCard(i, card);
+      });
+
+      const closeBtn = card.querySelector('.back-close');
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCard(i, card);
+      });
+
+      wrapper.appendChild(card);
+      grid.appendChild(wrapper);
+    });
+  }
+
+  function toggleCard(i, cardEl) {
+    const isFlipped = cardEl.classList.toggle('flipped');
+    cardEl.setAttribute('aria-pressed', isFlipped ? 'true' : 'false');
+    const backFace = cardEl.querySelector('.card-face-back');
+    const closeBtn = cardEl.querySelector('.back-close');
+    backFace.setAttribute('aria-hidden', isFlipped ? 'false' : 'true');
+    closeBtn.setAttribute('tabindex', isFlipped ? '0' : '-1');
+
+    if (isFlipped) {
+      cardEl.classList.add('completed');
+      const cta = cardEl.querySelector('.cta-text');
+      if (cta) cta.textContent = 'Reviewed. Click to flip again.';
+      if (!viewed.has(i)) {
+        viewed.add(i);
+        updateProgress();
+      }
+    }
+  }
+
+  function updateProgress() {
+    const pct = (viewed.size / programs.length) * 100;
+    fillEl.style.width = pct + '%';
+    labelEl.textContent = `${viewed.size} of ${programs.length} explored.`;
+  }
+
+  renderCards();
+
+  /* ---------- Subheader animation ---------- */
+  const SUBHEADER_TEXT = 'Understand the insurance programs your clients may be navigating.';
+  const subheaderEl = document.getElementById('subheader');
+  const typedEl = document.getElementById('typed');
+  const caretEl = document.getElementById('caret');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let typingTimer = null;
+
+  function cancelTyping() {
+    if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+  }
+
+  function runTypewriter(text, speedMs, showCursor) {
+    cancelTyping();
+    subheaderEl.classList.remove('fade-anim');
+    subheaderEl.style.opacity = '';
+    subheaderEl.style.transform = '';
+    typedEl.textContent = '';
+    caretEl.classList.toggle('hidden', !showCursor);
+    if (reducedMotion) {
+      typedEl.textContent = text;
+      return;
+    }
+    let i = 0;
+    const tick = () => {
+      if (i <= text.length) {
+        typedEl.textContent = text.slice(0, i);
+        i++;
+        typingTimer = setTimeout(tick, speedMs);
+      } else {
+        typingTimer = null;
+      }
+    };
+    typingTimer = setTimeout(tick, 250);
+  }
+
+  function runFade() {
+    cancelTyping();
+    typedEl.textContent = SUBHEADER_TEXT;
+    caretEl.classList.add('hidden');
+    subheaderEl.classList.remove('fade-anim');
+    subheaderEl.style.opacity = '';
+    subheaderEl.style.transform = '';
+    void subheaderEl.offsetWidth;
+    subheaderEl.classList.add('fade-anim');
+  }
+
+  function runInstant() {
+    cancelTyping();
+    typedEl.textContent = SUBHEADER_TEXT;
+    caretEl.classList.add('hidden');
+    subheaderEl.classList.remove('fade-anim');
+    subheaderEl.style.opacity = '1';
+    subheaderEl.style.transform = 'none';
+  }
+
+  function applyTweaks() {
+    subheaderEl.style.color = tweaks.subheaderColor;
+    if (tweaks.animationStyle === 'typewriter') {
+      runTypewriter(SUBHEADER_TEXT, tweaks.typingSpeedMs, tweaks.showCursor);
+    } else if (tweaks.animationStyle === 'fade') {
+      runFade();
+    } else {
+      runInstant();
+    }
+  }
+
+  applyTweaks();
+
+  /* ---------- Tweaks panel wiring ---------- */
+  const panel = document.getElementById('twPanel');
+  const closeBtn = document.getElementById('twClose');
+  const animGroup = document.getElementById('twAnim');
+  const speedRow = document.getElementById('twSpeedRow');
+  const speedInput = document.getElementById('twSpeed');
+  const speedVal = document.getElementById('twSpeedVal');
+  const cursorRow = document.getElementById('twCursorRow');
+  const cursorSwitch = document.getElementById('twCursor');
+  const colorGroup = document.getElementById('twColor');
+
+  function syncPanelUI() {
+    [...animGroup.querySelectorAll('button')].forEach(b => {
+      b.setAttribute('aria-pressed', b.dataset.val === tweaks.animationStyle ? 'true' : 'false');
+    });
+    speedInput.value = tweaks.typingSpeedMs;
+    speedVal.textContent = tweaks.typingSpeedMs + ' ms';
+    cursorSwitch.setAttribute('aria-checked', tweaks.showCursor ? 'true' : 'false');
+    [...colorGroup.querySelectorAll('button')].forEach(b => {
+      b.setAttribute('aria-pressed', b.dataset.val === tweaks.subheaderColor ? 'true' : 'false');
+    });
+    speedRow.classList.toggle('tw-row-hide', tweaks.animationStyle !== 'typewriter');
+    cursorRow.classList.toggle('tw-row-hide', tweaks.animationStyle !== 'typewriter');
+  }
+
+  function persist(edits) {
+    try {
+      window.parent.postMessage({ type: '__edit_mode_set_keys', edits: edits }, '*');
+    } catch (e) { /* not in host */ }
+  }
+
+  function setTweak(key, value) {
+    tweaks[key] = value;
+    syncPanelUI();
+    applyTweaks();
+    persist({ [key]: value });
+  }
+
+  animGroup.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-val]');
+    if (btn) setTweak('animationStyle', btn.dataset.val);
+  });
+  speedInput.addEventListener('input', (e) => {
+    setTweak('typingSpeedMs', parseInt(e.target.value, 10));
+  });
+  cursorSwitch.addEventListener('click', () => {
+    setTweak('showCursor', !tweaks.showCursor);
+  });
+  colorGroup.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-val]');
+    if (btn) setTweak('subheaderColor', btn.dataset.val);
+  });
+
+  syncPanelUI();
+
+  /* ---------- Edit-mode host protocol ---------- */
+  function showPanel() {
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+  }
+  function hidePanel() {
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+
+  window.addEventListener('message', (e) => {
+    const t = e.data && e.data.type;
+    if (t === '__activate_edit_mode') showPanel();
+    if (t === '__deactivate_edit_mode') hidePanel();
+  });
+
+  closeBtn.addEventListener('click', () => {
+    hidePanel();
+    try { window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); } catch (e) {}
+  });
+
+  try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch (e) {}
+</script>
+
+</body>
+</html>
